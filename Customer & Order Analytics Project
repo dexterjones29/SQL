@@ -1,0 +1,78 @@
+-- 3.3 Customer & Order Analytics Project
+
+SELECT *
+FROM customers
+WHERE length(order_id) = 6
+AND order_id != 'Order ID';
+
+-- 1. How many orders were placed in January? (Remember to filter out blank and incorrect order IDs)
+SELECT COUNT (orderID)
+FROM jansales
+WHERE length(orderID) = 6
+AND order_id != 'Order ID';
+
+-- 2. How many of those orders were for an iPhone?
+SELECT COUNT (orderID)
+FROM jansales
+WHERE length(orderID) = 6
+AND orderID != 'Order ID'
+AND Product LIKE 'iPhone';
+
+-- 3. Select the customer account numbers for all the orders that were placed in February.
+SELECT DISTINCT c.acctnum
+FROM febsales f
+LEFT JOIN customers c
+ON f.orderID = c.order_id
+WHERE length(orderID) = 6
+AND order_id != 'Order ID'
+ORDER BY acctnum ASC;
+
+-- 4. Which product was the cheapest one sold in January, and what was the price?
+
+SELECT DISTINCT product, price
+FROM jansales
+WHERE length(orderID) = 6
+AND orderID != 'Order ID'
+ORDER BY price
+LIMIT 5;
+
+-- 5. What is the total revenue for each product sold in January? (Revenue = products sold x product price)
+SELECT
+  Product
+, SUM (Quantity) AS Quantity
+, Price
+, ROUND (SUM (Quantity) * Price,2) AS Revenue
+FROM jansales
+WHERE length(orderID) = 6
+AND orderID != 'Order ID'
+GROUP BY product
+ORDER BY Revenue DESC;
+
+-- 6. Which products were sold in February at 548 Lincoln St, Seattle, WA 98101?
+SELECT
+  Product
+, location
+FROM febsales
+WHERE location LIKE '%548 Lincoln%';
+
+-- 7. How many of each were sold, and what was the total revenue?
+
+SELECT
+  COUNT (*)
+, ROUND (SUM (Quantity) * Price,2) AS Revenue
+, location
+FROM febsales
+WHERE location LIKE '%548 Lincoln%';
+
+-- 8. How many customers ordered more than 2 products at a time in February?
+-- 9. What was the average amount spent for those customers?
+
+SELECT 
+  COUNT(distinct acctnum) as two_product_customers
+, ROUND (AVG(quantity * price),2) as avg_spent
+FROM febsales f
+LEFT JOIN customers c
+ON f.orderID = c.order_id
+WHERE quantity > 2
+AND length(orderID) = 6
+AND orderID != 'Order ID';
